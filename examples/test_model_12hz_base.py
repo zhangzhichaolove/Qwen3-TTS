@@ -26,12 +26,22 @@ def ensure_dir(d: str):
 
 
 def run_case(tts: Qwen3TTSModel, out_dir: str, case_name: str, call_fn):
-    torch.cuda.synchronize()
+    # Replace torch.cuda.synchronize() with:
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+    elif torch.backends.mps.is_available():
+        torch.mps.synchronize() # The correct instruction for M4
+    # torch.cuda.synchronize()
     t0 = time.time()
 
     wavs, sr = call_fn()
 
-    torch.cuda.synchronize()
+    # Replace torch.cuda.synchronize() with:
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+    elif torch.backends.mps.is_available():
+        torch.mps.synchronize() # The correct instruction for M4
+    # torch.cuda.synchronize()
     t1 = time.time()
     print(f"[{case_name}] time: {t1 - t0:.3f}s, n_wavs={len(wavs)}, sr={sr}")
 
@@ -41,15 +51,24 @@ def run_case(tts: Qwen3TTSModel, out_dir: str, case_name: str, call_fn):
 
 def main():
     device = "cuda:0"
-    MODEL_PATH = "Qwen/Qwen3-TTS-12Hz-1.7B-Base/"
+    MODEL_PATH = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
     OUT_DIR = "qwen3_tts_test_voice_clone_output_wav"
     ensure_dir(OUT_DIR)
 
+    # tts = Qwen3TTSModel.from_pretrained(
+    #     MODEL_PATH,
+    #     device_map=device,
+    #     dtype=torch.bfloat16,
+    #     attn_implementation="flash_attention_2",
+    # )
+
+    # --- AFTER (Modified for M4) ---
+    MODEL_PATH = "Qwen/Qwen3-TTS-12Hz-1.7B-Base" # Remove the trailing slash
     tts = Qwen3TTSModel.from_pretrained(
         MODEL_PATH,
-        device_map=device,
-        dtype=torch.bfloat16,
-        attn_implementation="flash_attention_2",
+        torch_dtype=torch.bfloat16,   # M4 fully supports bfloat16
+        attn_implementation="sdpa",    # Use SDPA instead of FlashAttention2
+        device_map="mps",              # Force use of Apple GPU
     )
 
     # Reference audio(s)

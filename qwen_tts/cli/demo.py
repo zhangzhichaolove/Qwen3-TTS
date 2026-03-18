@@ -268,13 +268,7 @@ def build_demo(tts: Qwen3TTSModel, ckpt: str, gen_kwargs_default: Dict[str, Any]
     def _gen_common_kwargs() -> Dict[str, Any]:
         return dict(gen_kwargs_default)
 
-    theme = gr.themes.Soft(
-        font=[gr.themes.GoogleFont("Source Sans Pro"), "Arial", "sans-serif"],
-    )
-
-    css = ".gradio-container {max-width: none !important;}"
-
-    with gr.Blocks(theme=theme, css=css) as demo:
+    with gr.Blocks() as demo:
         gr.Markdown(
             f"""
 # Qwen3 TTS Demo
@@ -615,16 +609,32 @@ def main(argv=None) -> int:
     gen_kwargs_default = _collect_gen_kwargs(args)
     demo = build_demo(tts, ckpt, gen_kwargs_default)
 
+    theme = gr.themes.Soft(
+        font=[gr.themes.GoogleFont("Source Sans Pro"), "Arial", "sans-serif"],
+    )
+    css = ".gradio-container {max-width: none !important;}"
+
     launch_kwargs: Dict[str, Any] = dict(
         server_name=args.ip,
         server_port=args.port,
         share=args.share,
         ssl_verify=True if args.ssl_verify else False,
+        theme=theme,
+        css=css,
     )
     if args.ssl_certfile is not None:
         launch_kwargs["ssl_certfile"] = args.ssl_certfile
     if args.ssl_keyfile is not None:
         launch_kwargs["ssl_keyfile"] = args.ssl_keyfile
+
+    # Ensure Gradio's internal startup self-check bypasses any system proxy.
+    # On macOS, system-level HTTP proxies can intercept requests to localhost,
+    # causing the /gradio_api/startup-events health check to fail with 502.
+    _no_proxy = os.environ.get("no_proxy", "")
+    if "localhost" not in _no_proxy and "127.0.0.1" not in _no_proxy:
+        entries = [x for x in [_no_proxy, "localhost", "127.0.0.1"] if x]
+        os.environ["no_proxy"] = ",".join(entries)
+        os.environ["NO_PROXY"] = ",".join(entries)
 
     demo.queue(default_concurrency_limit=int(args.concurrency)).launch(**launch_kwargs)
     return 0

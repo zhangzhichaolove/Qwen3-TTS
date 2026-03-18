@@ -33,3 +33,9 @@ True
 True
 >>> exit()
 ```
+
+#demo
+
+```shell
+python -m qwen_tts.cli.demo Qwen/Qwen3-TTS-12Hz-1.7B-Base --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
+```

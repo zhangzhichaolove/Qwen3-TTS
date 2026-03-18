@@ -37,5 +37,10 @@ True
 #demo
 
 ```shell
+# 克隆音色
 python -m qwen_tts.cli.demo Qwen/Qwen3-TTS-12Hz-1.7B-Base --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
+# 可音色参数（如音高、语速、情感、性别）生成的定制化语音
+python -m qwen_tts.cli.demo Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
+# 模型内置的通用音色 可控制语气
+python -m qwen_tts.cli.demo Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
 ```

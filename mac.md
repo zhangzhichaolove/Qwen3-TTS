@@ -43,4 +43,14 @@ python -m qwen_tts.cli.demo Qwen/Qwen3-TTS-12Hz-1.7B-Base --device mps --dtype b
 python -m qwen_tts.cli.demo Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
 # 模型内置的通用音色 可控制语气
 python -m qwen_tts.cli.demo Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
+
+
+
+
+# 快速生成标准语音
+python -m qwen_tts.cli.demo /Users/peakchao/App/Qwen3-TTS/models/Qwen3-TTS-12Hz-1.7B-Base --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
+# 创造独特的虚拟角色声音
+python -m qwen_tts.cli.demo /Users/peakchao/App/Qwen3-TTS/models/Qwen3-TTS-12Hz-1.7B-VoiceDesign --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
+# 模仿特定人的声音
+python -m qwen_tts.cli.demo /Users/peakchao/App/Qwen3-TTS/models/Qwen3-TTS-12Hz-1.7B-CustomVoice --device mps --dtype bfloat16 --no-flash-attn --port 9000 --ip 127.0.0.1
 ```
